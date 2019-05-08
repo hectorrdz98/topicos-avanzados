@@ -13,6 +13,10 @@ public class Interfaz extends PApplet{
     public ArrayList <Coche> coches = new ArrayList<>();
     public Carril carriles[] = new Carril[4];
     
+    int btn1Dim[] = new int[4];
+    int btn2Dim[] = new int[4];
+    int btn3Dim[] = new int[4];
+    
     // Datos del puente
     Coche cocheEnPuente = null;
     
@@ -30,14 +34,31 @@ public class Interfaz extends PApplet{
         for (int i = 0; i<4; i++) {
             carriles[i] = new Carril();
         }
+        
         carriles[0].limiteCarril = 0;
         carriles[1].limiteCarril = 200;
         carriles[2].limiteCarril = 650;
         carriles[3].limiteCarril = 1000;
+        
+        btn1Dim[0] = 0 + 25;
+        btn1Dim[1] = height - 100 + 25;
+        btn1Dim[2] = 150;
+        btn1Dim[3] = 50;
+        
+        btn2Dim[0] = 0 + 25 + 150 + 50;
+        btn2Dim[1] = height - 100 + 25;
+        btn2Dim[2] = 150;
+        btn2Dim[3] = 50;
+        
+        btn3Dim[0] = 0 + 25 + 150 + 50 + 150 + 50;
+        btn3Dim[1] = height - 100 + 25;
+        btn3Dim[2] = 150;
+        btn3Dim[3] = 50;
     }
     
     @Override
     public void draw() {
+        // updateButtons(mouseX, mouseY);
         clear();
         
         // Dibujar el fondo
@@ -56,6 +77,25 @@ public class Interfaz extends PApplet{
         // Inferior
         fill(41, 41, 61);
         rect(0, height - 100, width, height);
+        
+        // Botones
+        fill(0, 102, 153);
+        strokeWeight(5);
+        stroke(0, 119, 179);
+        rect(btn1Dim[0], btn1Dim[1], btn1Dim[2], btn1Dim[3]);
+        rect(btn2Dim[0], btn2Dim[1], btn2Dim[2], btn2Dim[3]);
+        rect(btn3Dim[0], btn3Dim[1], btn3Dim[2], btn3Dim[3]);
+        
+        // Textos en botones
+        fill(255);
+        textSize(20);
+        textAlign(CENTER, CENTER);
+        text("Version #1", btn1Dim[0], btn1Dim[1], btn1Dim[2], btn1Dim[3]); 
+        text("Version #2", btn2Dim[0], btn2Dim[1], btn2Dim[2], btn2Dim[3]); 
+        text("Version #3", btn3Dim[0], btn3Dim[1], btn3Dim[2], btn3Dim[3]); 
+        
+        textAlign(LEFT);
+        noStroke();
         
         
         // Carretera
@@ -95,6 +135,9 @@ public class Interfaz extends PApplet{
                 stroke(0);
                 circle(coche.pos[0], coche.pos[1] + 50, 25);
                 circle(coche.pos[0] + 80, coche.pos[1] + 50, 25);
+                fill(255);
+                textSize(25);
+                text(this.coches.indexOf(coche), coche.pos[0] + 30, coche.pos[1] + 30); 
                 
                 // Comprobar la velocidad maxima
                 
@@ -171,23 +214,116 @@ public class Interfaz extends PApplet{
                             }
                         // Si no hay coches en el carril, ya que estamos en el puente
                         } else {
-                           coche.avanzar(coche.velocidad);
+                            // Si llegamos al final del puente
+                            if (coche.pos[0] - 80 - 50 - 50> this.carriles[2].limiteCarril) { 
+                                this.cocheEnPuente = null;
+                                this.carriles[3].coches.add(coche);
+                                coche.pos[1] += 100;
+                                // Quitar el freno al ultimo coche
+                                // this.carriles[1].coches.get(0).freno = false;
+                                int idCocheActual = this.coches.indexOf(coche);
+                                if (this.coches.size() > idCocheActual + 1) {
+                                    while (this.coches.get(idCocheActual + 1).freno == false) {
+                                        idCocheActual++;
+                                    }
+                                    this.coches.get(idCocheActual + 1).freno = false;
+                                }
+                                // coche.velocidad = 0;
+                            // Si no llegamos aun seguimos avanzando
+                            } else {
+                                coche.avanzar(coche.velocidad);
+                            }
                         }
                     }
                 } else {
-                    if (!this.carriles[2].coches.isEmpty()) {
-                        if (coche.pos[0] - 80 - 50 - 50 < this.carriles[2].limiteCarril) {
-                            coche.velocidad = 0;
-                        } else {
-                            int indexActualCoche = this.carriles[2].coches.indexOf(coche);
-                            if (indexActualCoche > 0) {
-                                Coche ultimoCoche = this.carriles[2].coches.get(indexActualCoche - 1);
-                                if (coche.pos[0] > (ultimoCoche.pos[0] + 80 + 50 + 50)) {
-                                    coche.avanzar(coche.velocidad);
+                    // Si ya cruzó el puente
+                    if (this.carriles[0].coches.indexOf(coche) != -1) {
+                        coche.avanzar(coche.velocidad);
+                    // Si no ha cruzado el puente
+                    } else {
+                        // Si hay coches en el carril
+                        if (!this.carriles[2].coches.isEmpty()) {
+                            // Si llegamos al limite del carril
+                            if (coche.pos[0] - 80 - 50 - 50 < this.carriles[2].limiteCarril) {
+                                // Si no somos el coche en el puente
+                                if (coche != this.cocheEnPuente) {
+                                    // Si ya hay un coche en el puente
+                                    if (this.cocheEnPuente != null) {
+                                        // coche.velocidad = 0;
+                                        coche.freno = true;
+                                    // Si no hay coche en el puente
+                                    } else {
+                                        this.carriles[2].coches.remove(coche);
+                                        this.cocheEnPuente = coche;
+                                        coche.pos[1] += 100;
+                                    }
+                                // Si somos el coche en el puente
                                 } else {
-                                    // No avanzar
-                                    // coche.avanzar(ultimoCoche.velocidad);
+                                    // Si llegamos al final del puente
+                                    if (coche.pos[0] + 80 + 50 < this.carriles[1].limiteCarril) { 
+                                        this.cocheEnPuente = null;
+                                        this.carriles[0].coches.add(coche);
+                                        coche.pos[1] -= 100;
+                                        // Quitar el freno al ultimo coche
+                                        // this.carriles[1].coches.get(0).freno = false;
+                                        int idCocheActual = this.coches.indexOf(coche);
+                                        if (this.coches.size() > idCocheActual + 1) {
+                                            while (this.coches.get(idCocheActual + 1).freno == false) {
+                                                idCocheActual++;
+                                            }
+                                            this.coches.get(idCocheActual + 1).freno = false;
+                                        }
+                                        // coche.velocidad = 0;
+                                    // Si no llegamos aun seguimos avanzando
+                                    } else {
+                                        coche.avanzar(coche.velocidad);
+                                    }
                                 }
+                            // Si no hemos llegado al limite del carril
+                            } else {
+                                // Si no somos el coche en el puente
+                                if (coche != this.cocheEnPuente) {
+                                    // Obtenemos el id del nuestro coche en el carril
+                                    int indexActualCoche = this.carriles[2].coches.indexOf(coche);
+                                    // Si no somos el primer coche
+                                    if (indexActualCoche > 0) {
+                                        // Obtenemos el coche que va adelante de nosotros
+                                        Coche ultimoCoche = this.carriles[2].coches.get(indexActualCoche - 1);
+                                        // Si no lo hemos alcanzado
+                                        if (coche.pos[0] > (ultimoCoche.pos[0] + 80 + 50 + 50)) {
+                                            coche.avanzar(coche.velocidad);
+                                        // Si ya lo alcanzamos
+                                        } else {
+                                            // No avanzar
+                                            // coche.avanzar(ultimoCoche.velocidad);
+                                        }
+                                    // Si somos el primer coche del carril solo avanzamos
+                                    } else {
+                                        coche.avanzar(coche.velocidad);
+                                    }
+                                // Si somos el coche en el puente
+                                } else {
+                                    coche.avanzar(coche.velocidad);
+                                }
+                            }
+                        // Si no hay coches en el carril, ya que estamos en el puente
+                        } else {
+                            // Si llegamos al final del puente
+                            if (coche.pos[0] + 80 + 50 < this.carriles[1].limiteCarril) { 
+                                this.cocheEnPuente = null;
+                                this.carriles[0].coches.add(coche);
+                                coche.pos[1] -= 100;
+                                // Quitar el freno al ultimo coche
+                                // this.carriles[1].coches.get(0).freno = false;
+                                int idCocheActual = this.coches.indexOf(coche);
+                                if (this.coches.size() > idCocheActual + 1) {
+                                    while (this.coches.get(idCocheActual + 1).freno == false) {
+                                        idCocheActual++;
+                                    }
+                                    this.coches.get(idCocheActual + 1).freno = false;
+                                }
+                                // coche.velocidad = 0;
+                            // Si no llegamos aun seguimos avanzando
                             } else {
                                 coche.avanzar(coche.velocidad);
                             }

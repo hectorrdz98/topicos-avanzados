@@ -37,8 +37,8 @@ public class GeneradorCoches extends Thread{
                 ThreadLocalRandom.current().nextInt(0, 255 + 1),
                 ThreadLocalRandom.current().nextInt(0, 255 + 1)
             };
-            int direccion = ThreadLocalRandom.current().nextInt(1, 1 + 1);
-            int velocidad = ThreadLocalRandom.current().nextInt(3, 5 + 1);
+            int direccion = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+            int velocidad = ThreadLocalRandom.current().nextInt(3, 7 + 1);
             
             Coche aux = new Coche(color, direccion, velocidad);
             
