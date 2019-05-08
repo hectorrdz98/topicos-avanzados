@@ -23,6 +23,9 @@ public class CarrilUnico {
         
         GeneradorCoches gen = new GeneradorCoches(interfaz);
         gen.start();
+        
+        Cronometro cron = new Cronometro(interfaz);
+        cron.start();
     }
     
 }

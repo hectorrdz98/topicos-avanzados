@@ -13,12 +13,14 @@ public class Interfaz extends PApplet{
     public ArrayList <Coche> coches = new ArrayList<>();
     public Carril carriles[] = new Carril[4];
     
-    int btn1Dim[] = new int[4];
-    int btn2Dim[] = new int[4];
-    int btn3Dim[] = new int[4];
+    int btnsDim[][] = new int[3][4];
+    
+    int btnActivo = 0;
     
     // Datos del puente
     Coche cocheEnPuente = null;
+    
+    String cronometro = "";
     
     public Interfaz() {
 
@@ -40,20 +42,20 @@ public class Interfaz extends PApplet{
         carriles[2].limiteCarril = 650;
         carriles[3].limiteCarril = 1000;
         
-        btn1Dim[0] = 0 + 25;
-        btn1Dim[1] = height - 100 + 25;
-        btn1Dim[2] = 150;
-        btn1Dim[3] = 50;
+        btnsDim[0][0] = 0 + 25;
+        btnsDim[0][1] = height - 100 + 25;
+        btnsDim[0][2] = 150;
+        btnsDim[0][3] = 50;
         
-        btn2Dim[0] = 0 + 25 + 150 + 50;
-        btn2Dim[1] = height - 100 + 25;
-        btn2Dim[2] = 150;
-        btn2Dim[3] = 50;
+        btnsDim[1][0] = 0 + 25 + 150 + 50;
+        btnsDim[1][1] = height - 100 + 25;
+        btnsDim[1][2] = 150;
+        btnsDim[1][3] = 50;
         
-        btn3Dim[0] = 0 + 25 + 150 + 50 + 150 + 50;
-        btn3Dim[1] = height - 100 + 25;
-        btn3Dim[2] = 150;
-        btn3Dim[3] = 50;
+        btnsDim[2][0] = 0 + 25 + 150 + 50 + 150 + 50;
+        btnsDim[2][1] = height - 100 + 25;
+        btnsDim[2][2] = 150;
+        btnsDim[2][3] = 50;
     }
     
     @Override
@@ -79,20 +81,29 @@ public class Interfaz extends PApplet{
         rect(0, height - 100, width, height);
         
         // Botones
-        fill(0, 102, 153);
-        strokeWeight(5);
-        stroke(0, 119, 179);
-        rect(btn1Dim[0], btn1Dim[1], btn1Dim[2], btn1Dim[3]);
-        rect(btn2Dim[0], btn2Dim[1], btn2Dim[2], btn2Dim[3]);
-        rect(btn3Dim[0], btn3Dim[1], btn3Dim[2], btn3Dim[3]);
+        for (int i = 0; i<3; i++) {
+            strokeWeight(5);
+            if (i != btnActivo) {
+                fill(0, 102, 153);
+                stroke(0, 119, 179);
+            } else {
+                fill(0, 204, 153);
+                stroke(0, 102, 0);
+            }
+            rect(btnsDim[i][0], btnsDim[i][1], btnsDim[i][2], btnsDim[i][3]);
+            
+            // Texto
+            fill(255);
+            textSize(20);
+            textAlign(CENTER, CENTER);
+            text("Version #" + (i+1), btnsDim[i][0], btnsDim[i][1], btnsDim[i][2], btnsDim[i][3]); 
+        } 
         
-        // Textos en botones
+        // Cronometro
         fill(255);
-        textSize(20);
+        textSize(25);
         textAlign(CENTER, CENTER);
-        text("Version #1", btn1Dim[0], btn1Dim[1], btn1Dim[2], btn1Dim[3]); 
-        text("Version #2", btn2Dim[0], btn2Dim[1], btn2Dim[2], btn2Dim[3]); 
-        text("Version #3", btn3Dim[0], btn3Dim[1], btn3Dim[2], btn3Dim[3]); 
+        text(this.cronometro, width - 100, height - 50); 
         
         textAlign(LEFT);
         noStroke();
@@ -347,7 +358,7 @@ public class Interfaz extends PApplet{
             });
             
             // Debugg de los carriles
-            
+            /*
             for (int i = 0; i<4; i++) {
                 System.out.println("El carril " + i + ":");
                 if (this.carriles[i].coches.isEmpty()) {
@@ -355,12 +366,22 @@ public class Interfaz extends PApplet{
                 } else {
                     System.out.println("El primer coche. Pos: " + Arrays.toString(this.carriles[i].coches.get(0).pos) + ", vel: " + this.carriles[i].coches.get(0).velocidad);
                 }
-            }
+            }*/
             
             fill(255);
             textSize(30);
             text("Coches: " + coches.size(), 20, 50);
         } catch (Exception e) {}
+    }
+    
+    @Override
+    public void mousePressed() {
+        for (int i = 0; i<3; i++) {
+            if (pmouseX >= btnsDim[i][0] && pmouseX <= btnsDim[i][0] + btnsDim[i][2] && pmouseY >= btnsDim[i][1] && pmouseY <= btnsDim[i][1] + btnsDim[i][3]) {
+                this.btnActivo = i;
+                break;
+            }
+        }
     }
 
 }

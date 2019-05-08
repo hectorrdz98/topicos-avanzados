@@ -27,7 +27,8 @@ public class GeneradorCoches extends Thread{
     public void run() {
         while(continuar) {
             try {
-                Thread.sleep(2000);
+                if (this.interfaz.btnActivo == 0) Thread.sleep(10000);
+                else Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(GeneradorCoches.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -37,7 +38,15 @@ public class GeneradorCoches extends Thread{
                 ThreadLocalRandom.current().nextInt(0, 255 + 1),
                 ThreadLocalRandom.current().nextInt(0, 255 + 1)
             };
-            int direccion = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+            
+            int direccion = 0;
+            
+            if (this.interfaz.btnActivo == 0 || this.interfaz.btnActivo == 1) {
+                direccion = ThreadLocalRandom.current().nextInt(0, 0 + 1);
+            } else {
+                direccion = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+            }
+            
             int velocidad = ThreadLocalRandom.current().nextInt(3, 7 + 1);
             
             Coche aux = new Coche(color, direccion, velocidad);
